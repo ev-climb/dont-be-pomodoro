@@ -10,4 +10,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'), // Настройка пути для @
     },
   },
+  build: {
+    outDir: "docs" 
+  }
 })
