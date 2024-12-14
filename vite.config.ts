@@ -10,6 +10,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'), // Настройка пути для @
     },
   },
+  base: '/ev-climb.github.io/',
   build: {
     outDir: "docs" 
   }
