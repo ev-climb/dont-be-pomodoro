@@ -4,13 +4,13 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/dont-be-pomodoro/',
   plugins: [vue()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'), // Настройка пути для @
     },
   },
-  base: '/ev-climb.github.io/',
   build: {
     outDir: "docs" 
   }
