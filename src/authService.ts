@@ -1,4 +1,5 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
+// @ts-ignore
 import { auth } from "./firebaseConfig";
 
 // Регистрация пользователя

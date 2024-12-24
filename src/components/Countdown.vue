@@ -10,8 +10,36 @@
       size="small"
       class="play-btn"
     ></v-btn>
-    <v-btn v-else class="play-btn" @click="play" icon="mdi-play" variant="outlined" size="small"></v-btn>
-    <v-icon class="reset" icon="mdi-replay" @click="reset"></v-icon>
+    <v-btn
+      v-else
+      class="play-btn"
+      @click="play"
+      icon="mdi-play"
+      variant="outlined"
+      size="small"
+    ></v-btn>
+    <v-icon class="icon reset" icon="mdi-replay" @click="reset"></v-icon>
+    <v-icon class="icon autorenew" icon="mdi-autorenew" @click="reset"></v-icon>
+    <v-dialog max-width="400">
+      <template v-slot:activator="{ props: activatorProps }">
+        <v-icon
+          v-bind="activatorProps"
+          class="icon reactivate"
+          icon="mdi-account-reactivate-outline"
+          @click="reset"
+        ></v-icon>
+      </template>
+
+      <template v-slot:default="{ isActive }">
+        <v-card title="EXIT?" color="#4bc0c0">
+
+          <v-card-actions>
+            <v-btn text="yes" @click="logout"></v-btn>
+            <v-btn text="no" @click="isActive.value = false"></v-btn>
+          </v-card-actions>
+        </v-card>
+      </template>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -19,6 +47,9 @@
 import { ref, onUnmounted } from "vue";
 // @ts-ignore
 import { useTimeStore } from "@/stores/time";
+// @ts-ignore
+import { auth } from "../firebaseConfig";
+import { signOut } from "firebase/auth"; // Импортируем метод signOut
 
 const timeStore = useTimeStore();
 
@@ -27,15 +58,15 @@ const minutes2 = ref<number>(5);
 const seconds1 = ref<number>(0);
 const seconds2 = ref<number>(0);
 
-let startTime: number | null = null; 
-let elapsedTime = 0; 
+let startTime: number | null = null;
+let elapsedTime = 0;
 
 const isPlaying = ref<boolean>(false);
 let timerInterval: ReturnType<typeof setInterval> | null = null;
 
 async function play() {
   if (!startTime) {
-    startTime = Date.now(); 
+    startTime = Date.now();
   }
   isPlaying.value = true;
 
@@ -48,8 +79,8 @@ async function play() {
 
 async function pause() {
   if (startTime) {
-    elapsedTime += Math.floor((Date.now() - startTime) / 1000); 
-    startTime = null; 
+    elapsedTime += Math.floor((Date.now() - startTime) / 1000);
+    startTime = null;
   }
 
   isPlaying.value = false;
@@ -112,6 +143,20 @@ function decrementTime() {
   }
 }
 
+async function logout() {
+  // Синхронизируем данные перед выходом
+  await syncWithFirebase();
+
+  // Выход из аккаунта
+  try {
+    await signOut(auth);
+    console.log("User has logged out");
+    // Можно добавить редирект или другое действие после выхода
+  } catch (error) {
+    console.error("Error logging out:", error);
+  }
+}
+
 onUnmounted(() => {
   if (timerInterval) {
     clearInterval(timerInterval);
@@ -134,25 +179,36 @@ onUnmounted(() => {
   align-items: center;
   flex-direction: column;
   position: relative;
-  .reset {
+  .icon {
     color: rgba(75, 192, 192, 1);
     position: absolute;
-    left: 10px;
-    top: 10px;
     font-size: 16px;
     cursor: pointer;
     border-radius: 50%;
     transition: all 0.2s ease-in-out;
     padding: 10px;
     &:hover {
-      box-shadow: 0px 0px 11px -2px rgba(75, 192, 192, 1);
+      box-shadow: 0px 0px 11px -2px rgb(75, 192, 192);
     }
     &:active {
       box-shadow: 0px 0px 6px -2px rgba(75, 192, 192, 1);
     }
   }
+  .reactivate {
+    top: 10px;
+    left: 10px;
+  }
+  .reset {
+    left: 10px;
+    top: 40px;
+  }
+  .autorenew {
+    top: 70px;
+    left: 10px;
+  }
+
   .play-btn {
-    color: rgba(75, 192, 192, 1)
+    color: rgba(75, 192, 192, 1);
   }
 }
 </style>

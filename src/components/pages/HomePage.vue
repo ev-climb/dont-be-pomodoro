@@ -18,7 +18,6 @@ import Chart from "../Chart.vue";
 import Register from "../Register.vue";
 
 const timeStore = useTimeStore();
-console.log(timeStore.userId);
 
 
 </script>
